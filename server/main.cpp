@@ -85,9 +85,11 @@ public:
                 } else {
                     throw std::invalid_argument("Invalid capture, must capture opponent's checker");
                 }
-            } else {
+            } else if (std::abs(rowDiff) == 1 && std::abs(colDiff) == 1) {
                 checkers[index].position = secondPosition;
                 currentTurn = (color == "white") ? "black" : "white";
+            } else {
+                throw std::invalid_argument("Invalid move, can only move one diagonal step or capture opponent's checker");
             }
 
         } catch(std::invalid_argument& error) {
