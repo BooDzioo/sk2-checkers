@@ -61,20 +61,36 @@ public:
             std::pair<int, int> secondPosition = std::make_pair(stoi(secondPositionRow), stoi(secondPositionColumn));
 
             try {
-                findCheckerIndexAtPosition(checkers, secondPosition);
-
-                return false;
-            } catch(std::invalid_argument error) {
+                size_t targetIndex = findCheckerIndexAtPosition(checkers, secondPosition);
+                throw std::invalid_argument("Target position is occupied");
+            } catch(std::invalid_argument& error) {
             }
 
-            checkers[index].position = secondPosition;
-            if(color == "white") {
-                currentTurn = "black";
+            int rowDiff = secondPosition.first - firstPosition.first;
+            int colDiff = secondPosition.second - firstPosition.second;
+
+            if (std::abs(rowDiff) == 2 && std::abs(colDiff) == 2) {
+                std::pair<int, int> capturedPosition = std::make_pair(
+                        firstPosition.first + rowDiff / 2,
+                        firstPosition.second + colDiff / 2
+                );
+
+                size_t capturedIndex = findCheckerIndexAtPosition(checkers, capturedPosition);
+
+                if (checkers[capturedIndex].getColor() == (color == "white" ? "black" : "white")) {
+                    checkers[index].position = secondPosition;
+                    checkers.erase(checkers.begin() + capturedIndex);
+
+                    currentTurn = (color == "white") ? "black" : "white";
+                } else {
+                    throw std::invalid_argument("Invalid capture, must capture opponent's checker");
+                }
             } else {
-                currentTurn = "white";
+                checkers[index].position = secondPosition;
+                currentTurn = (color == "white") ? "black" : "white";
             }
 
-        } catch(std::invalid_argument error) {
+        } catch(std::invalid_argument& error) {
             return false;
         }
 
